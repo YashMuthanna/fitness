@@ -34,23 +34,6 @@ export default function FactoryPage() {
     }));
   };
 
-  const compute = (formData: MachineData) => {
-    const MAX_POWER = 50; // 50kW maximum
-
-    const machineData = {
-      machineA: { weight: 10, power: 2, runs: 0 },
-      machineB: { weight: 20, power: 5, runs: 0 },
-      machineC: { weight: 35, power: 10, runs: 0 },
-      machineD: { weight: 50, power: 15, runs: 0 },
-      machineE: { weight: 100, power: 40, runs: 0 },
-    };
-
-    Object.entries(formData).forEach(([machine, runs]) => {
-      const machineKey = machine as keyof MachineData;
-      machineData[machineKey].runs = runs;
-    });
-  };
-
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -63,6 +46,7 @@ export default function FactoryPage() {
     <div className="container mx-auto py-10 px-4">
       <div className="max-w-lg mx-auto bg-white rounded-lg border shadow-sm">
         <div className="p-6 border-b">
+          <h1 className="text-2xl font-semibold">Not Implemented!</h1>
           <h2 className="text-xl font-semibold">Machine Run Frequency</h2>
           <p className="text-sm text-gray-500">
             Enter how many times each machine runs per hour
