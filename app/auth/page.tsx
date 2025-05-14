@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { supabase } from "../utils/supabase/client";
+import Link from "next/link";
 
 export default function AuthPage() {
   const router = useRouter();
@@ -49,6 +50,11 @@ export default function AuthPage() {
             <span>Sign in with Google</span>
           )}
         </Button>
+      </div>
+      <div className="mt-4 py-4 text-sm text-gray-500">
+        <Link href="/">
+          <Button variant="link">Back to Home</Button>
+        </Link>
       </div>
     </div>
   );
