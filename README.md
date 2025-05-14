@@ -1,36 +1,22 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## What I Built
 
-## Getting Started
+A prototype for a Bodybuilding and Fitness App that makes use of Generative AI to answer user queries and give fitness tips.
 
-First, run the development server:
+- Basic Authentication using Supabase GoogleAuth - Implicit type for faster development
+- Vanilla OpenAI API (GPT4o-mini model) to answer fitness tips.
+- Prompt template is a very simple one-liner.
+- Protein Factory Logic problem (Not yet started)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## What I learnt
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Basics of Next.js - Server / Client components, what is SSR, cool in-built App Router
+- How to make use of Supabase's open-source tools, in this case Google Auth.
+- Refresher on JWT, and how Social Auth works in general
+- How to work with OpenAI APIs, no frameworks yet. Just plain API.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Things I would improve
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Maybe after a deep dive into how SSR works, try rendering as many components as possible in the server. Currently did not make much use of this.
+- Set up some extra context for the LLM, pass in some additional user specific info taken during sign up and give it as a system prompt.
+- Improve the authentication flow. Move into PKCE server-side auth instead.
+- Look into improving response from LLM, use Agentic frameworks to attach tools, and possibly set up multi-agent architecture ( Although for this use-case it might be overkill) - Maybe take set up different Agents for Nutritionist and Fitness tips.
