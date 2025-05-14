@@ -63,7 +63,9 @@ export default function FactoryPage() {
     <div className="container mx-auto py-10 px-4">
       <div className="max-w-lg mx-auto bg-white rounded-lg border shadow-sm">
         <div className="p-6 border-b">
-          <h2 className="text-xl font-semibold">Machine Run Frequency</h2>
+          <h2 className="text-xl font-semibold">
+            INCOMPLETE: Machine Run Frequency
+          </h2>
           <p className="text-sm text-gray-500">
             Enter how many times each machine runs per hour
           </p>

@@ -1,7 +1,32 @@
+"use client";
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "./utils/supabase/client";
 
 export default function Home() {
+  const router = useRouter();
+
+  useEffect(() => {
+    // Check authentication status when the component mounts
+    const checkAuth = async () => {
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (session) {
+          router.push("/dashboard");
+        }
+      } catch (error) {
+        console.error("Home auth check error:", error);
+      }
+    };
+
+    checkAuth();
+  }, [router]);
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-background">
       <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">

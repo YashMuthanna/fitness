@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import ChatMessage from "@/components/chat-message";
 import { LogOut } from "lucide-react";
+import { supabase } from "../utils/supabase/client";
+import { Session, AuthChangeEvent } from "@supabase/supabase-js";
 
 type Message = {
   role: "user" | "assistant";
@@ -14,6 +16,8 @@ type Message = {
 
 export default function Dashboard() {
   const router = useRouter();
+  const [session, setSession] = useState<Session | null>(null);
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
   const [prompt, setPrompt] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
@@ -23,6 +27,43 @@ export default function Dashboard() {
         "Hello! I'm your AI fitness advisor. Ask me anything about workouts, nutrition, or bodybuilding techniques.",
     },
   ]);
+
+  // Check authentication when component mounts
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+
+        if (!data.session) {
+          // Not authenticated, redirect to auth page
+          router.push("/auth");
+        } else {
+          setSession(data.session);
+        }
+      } catch (error) {
+        console.error("Auth check error:", error);
+        router.push("/auth");
+      } finally {
+        setIsAuthChecking(false);
+      }
+    };
+
+    checkAuth();
+
+    // Set up auth state listener
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(
+      (event: AuthChangeEvent, currentSession: Session | null) => {
+        setSession(currentSession);
+        if (!currentSession) router.push("/auth");
+      }
+    );
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,9 +109,19 @@ export default function Dashboard() {
     }
   };
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
     router.push("/auth");
   };
+
+  // Show loading state while checking auth
+  if (isAuthChecking) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen flex-col bg-white">
