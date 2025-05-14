@@ -3,17 +3,27 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { supabase } from "../utils/supabase/client";
 
 export default function AuthPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleGoogleSignIn = () => {
+  const handleGoogleSignIn = async () => {
     setIsLoading(true);
-    // Simulate authentication
-    setTimeout(() => {
-      router.push("/dashboard");
-    }, 1000);
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+    console.log("data", data);
+    console.log("URL", data.url);
+    if (error) {
+      console.error("Error signing in:", error);
+      setIsLoading(false);
+    }
+    setIsLoading(false);
   };
 
   return (
