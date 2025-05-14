@@ -29,16 +29,26 @@ export default function AuthPage() {
       setIsLoading(true);
 
       // Determine the redirect URL based on environment
-      const productionURL = "https://fitness-five-mauve.vercel.app";
-      const baseURL =
-        window.location.hostname === "localhost"
-          ? window.location.origin
-          : productionURL;
+      // Get the current URL's origin to determine production vs development
+      let redirectUrl;
+
+      if (typeof window !== "undefined") {
+        // Force use full production URL for all deployed environments
+        if (window.location.hostname !== "localhost") {
+          // Use the exact same hostname that the request came from
+          redirectUrl = `${window.location.origin}/auth/callback`;
+        } else {
+          // Local development
+          redirectUrl = "http://localhost:3000/auth/callback";
+        }
+      }
+
+      console.log("Redirecting to:", redirectUrl);
 
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${baseURL}/auth/callback`,
+          redirectTo: redirectUrl,
         },
       });
 
