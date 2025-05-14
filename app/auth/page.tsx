@@ -28,22 +28,35 @@ export default function AuthPage() {
     try {
       setIsLoading(true);
 
-      // Get the current URL
-      const origin =
-        typeof window !== "undefined" ? window.location.origin : "";
+      // Get the current hostname to determine environment
+      const hostname =
+        typeof window !== "undefined" ? window.location.hostname : "";
 
-      // Construct the callback URL
-      const callbackUrl = `${origin}/auth/callback`;
+      // Use hardcoded URLs that exactly match what's in Google Cloud Console
+      let redirectUrl;
 
-      console.log("Using callback URL:", callbackUrl);
+      if (hostname === "localhost") {
+        redirectUrl = "http://localhost:3000/auth/callback";
+      } else if (hostname === "fitness-9uwg.vercel.app") {
+        redirectUrl = "https://fitness-9uwg.vercel.app/auth/callback";
+      } else if (hostname === "fitness-five-mauve.vercel.app") {
+        redirectUrl = "https://fitness-five-mauve.vercel.app/auth/callback";
+      } else {
+        // Fallback to current origin + path (should rarely happen)
+        redirectUrl = `${window.location.origin}/auth/callback`;
+      }
+
+      console.log("====== AUTH DEBUG ======");
+      console.log("Hostname:", hostname);
+      console.log("Using redirect URL:", redirectUrl);
+      console.log("=======================");
 
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: callbackUrl,
+          redirectTo: redirectUrl,
           queryParams: {
             // This forces Google to show the account selection screen
-            // which can help avoid login issues
             prompt: "select_account",
           },
         },
