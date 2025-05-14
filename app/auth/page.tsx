@@ -28,27 +28,24 @@ export default function AuthPage() {
     try {
       setIsLoading(true);
 
-      // Determine the redirect URL based on environment
-      // Get the current URL's origin to determine production vs development
-      let redirectUrl;
+      // Get the current URL
+      const origin =
+        typeof window !== "undefined" ? window.location.origin : "";
 
-      if (typeof window !== "undefined") {
-        // Force use full production URL for all deployed environments
-        if (window.location.hostname !== "localhost") {
-          // Use the exact same hostname that the request came from
-          redirectUrl = `${window.location.origin}/auth/callback`;
-        } else {
-          // Local development
-          redirectUrl = "http://localhost:3000/auth/callback";
-        }
-      }
+      // Construct the callback URL
+      const callbackUrl = `${origin}/auth/callback`;
 
-      console.log("Redirecting to:", redirectUrl);
+      console.log("Using callback URL:", callbackUrl);
 
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: redirectUrl,
+          redirectTo: callbackUrl,
+          queryParams: {
+            // This forces Google to show the account selection screen
+            // which can help avoid login issues
+            prompt: "select_account",
+          },
         },
       });
 

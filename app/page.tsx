@@ -2,30 +2,53 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "./utils/supabase/client";
 
 export default function Home() {
   const router = useRouter();
+  const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
     // Check authentication status when the component mounts
     const checkAuth = async () => {
       try {
+        // Important: This will detect tokens in the URL hash
+        // which is essential for the implicit flow to work
         const {
           data: { session },
         } = await supabase.auth.getSession();
+
         if (session) {
+          console.log("Session found, redirecting to dashboard");
           router.push("/dashboard");
+        } else {
+          console.log("No session found, staying on homepage");
+          setIsChecking(false);
         }
       } catch (error) {
         console.error("Home auth check error:", error);
+        setIsChecking(false);
       }
     };
 
-    checkAuth();
+    // Add a small delay to ensure the auth state is processed
+    const timer = setTimeout(() => {
+      checkAuth();
+    }, 100);
+
+    return () => clearTimeout(timer);
   }, [router]);
+
+  // Show loading while checking auth
+  if (isChecking) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-background">

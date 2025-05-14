@@ -11,6 +11,16 @@ if (typeof window !== "undefined" && (!supabaseUrl || !supabaseAnonKey)) {
   );
 }
 
+// Get the site URL - handles both local and production environments
+const getSiteUrl = () => {
+  let url = typeof window !== "undefined" ? window.location.origin : "";
+  // Note: Vercel automatically sets this environment variable
+  if (process.env.NEXT_PUBLIC_VERCEL_URL) {
+    url = `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`;
+  }
+  return url;
+};
+
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
@@ -18,5 +28,11 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     detectSessionInUrl: true,
     flowType: "implicit",
     storage: typeof window !== "undefined" ? window.localStorage : undefined,
+    // Override the default redirect behavior
+    // For local development
+    ...(typeof window !== "undefined" &&
+    window.location.hostname === "localhost"
+      ? { url: "http://localhost:3000" }
+      : {}),
   },
 });
