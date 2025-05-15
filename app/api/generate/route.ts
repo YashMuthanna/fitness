@@ -19,14 +19,14 @@ export async function POST(request: Request) {
         {
           role: "system",
           content:
-            "You are a certified fitness coach. Answer questions strictly about bodybuilding, nutrition, and exercise. If asked unrelated topics, respond: 'I specialize in fitness advice.'",
+            "You are a certified fitness coach. Answer questions strictly about bodybuilding, nutrition, and exercise.",
         },
         {
           role: "user",
           content: body.prompt,
         },
       ],
-      max_tokens: 500,
+      max_tokens: 250,
     });
 
     return NextResponse.json({ result: response.choices[0].message.content });

@@ -5,24 +5,35 @@ import { Button } from "@/components/ui/button";
 
 // Define machine data type
 type MachineData = {
-  machineA: number;
-  machineB: number;
-  machineC: number;
-  machineD: number;
-  machineE: number;
+  machineA: number | null;
+  machineB: number | null;
+  machineC: number | null;
+  machineD: number | null;
+  machineE: number | null;
+};
+
+type ComputeResponse = {
+  status: "success" | "error";
+  message: string;
+  totalPower: number;
+  totalValue: number;
+  optimal: boolean;
+  optimizedValue?: number;
+  optimizedRuns?: Record<string, number>;
 };
 
 export default function FactoryPage() {
   const [formData, setFormData] = useState<MachineData>({
-    machineA: 0,
-    machineB: 0,
-    machineC: 0,
-    machineD: 0,
-    machineE: 0,
+    machineA: null,
+    machineB: null,
+    machineC: null,
+    machineD: null,
+    machineE: null,
   });
 
-  const [submitted, setSubmitted] = useState(false);
+  const [result, setResult] = useState<ComputeResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -34,12 +45,31 @@ export default function FactoryPage() {
     }));
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    console.log("Submitted data:", formData);
-    setSubmitted(true);
-    setIsLoading(false);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/compute", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to compute values");
+      }
+
+      const data: ComputeResponse = await response.json();
+      setResult(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -47,7 +77,7 @@ export default function FactoryPage() {
       <div className="max-w-lg mx-auto bg-white rounded-lg border shadow-sm">
         <div className="p-6 border-b">
           <h2 className="text-xl font-semibold">
-            INCOMPLETE - Machine Run Frequency
+            INCOMPLETE-Machine Run Frequency
           </h2>
           <p className="text-sm text-gray-500">
             Enter how many times each machine runs per hour
@@ -65,9 +95,10 @@ export default function FactoryPage() {
                     <input
                       id={machine}
                       name={machine}
+                      placeholder="0"
                       type="number"
                       min="0"
-                      value={formData[machine]}
+                      value={formData[machine] ?? ""}
                       onChange={handleChange}
                       className="w-full px-3 py-2 border rounded-md bg-white text-black"
                       style={{ backgroundColor: "white" }}
@@ -88,29 +119,39 @@ export default function FactoryPage() {
         </form>
       </div>
 
-      {submitted && (
+      {error && (
+        <div className="max-w-lg mx-auto mt-8 p-4 bg-red-50 border border-red-200 rounded-lg text-red-600">
+          {error}
+        </div>
+      )}
+
+      {result && (
         <div className="max-w-lg mx-auto mt-8 bg-white rounded-lg border shadow-sm">
           <div className="p-6 border-b">
-            <h2 className="text-xl font-semibold">Submitted Data</h2>
+            <h2 className="text-xl font-semibold">Results</h2>
           </div>
           <div className="p-6">
-            <div className="space-y-2">
-              {/* {(Object.entries(formData) as [keyof MachineData, number][]).map(
-                ([machine, runs]) => (
-                  <div
-                    key={machine}
-                    className="flex justify-between items-center border-b pb-2"
-                  >
-                    <span>Machine {machine.replace("machine", "")}</span>
-                    <span className="font-semibold">{runs} times per hour</span>
-                  </div>
-                )
-              )} */}
-              <div className="flex justify-between items-center pt-2 font-bold">
-                <span>Total Runs</span>
-                {/* <span>{compute(formData)} times per hour</span> */}
-              </div>
+            <div className="text-lg font-medium text-center mb-4">
+              {result.message}
             </div>
+
+            {result.optimal && result.optimizedRuns && (
+              <div className="mt-6">
+                <div className="text-sm font-semibold mb-2 text-center">
+                  Optimal Configuration (Max Protein: {result.optimizedValue}kg)
+                </div>
+                <div className="space-y-2 border-t pt-2">
+                  {Object.entries(result.optimizedRuns).map(
+                    ([machine, runs]) => (
+                      <div key={machine} className="flex justify-between">
+                        <span>Machine {machine.replace("machine", "")}</span>
+                        <span className="font-medium">{runs} runs</span>
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

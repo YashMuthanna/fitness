@@ -18,6 +18,7 @@ export default function AuthCallback() {
         if (error) {
           console.error("Error getting session:", error.message);
           router.push("/auth"); // Redirect to auth page if there's an error
+
           return;
         }
 
@@ -29,6 +30,7 @@ export default function AuthCallback() {
 
           // Successfully authenticated, redirect to dashboard
           router.push("/dashboard");
+          
         } else {
           // No session, redirect back to auth page
           router.push("/auth");
