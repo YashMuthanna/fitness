@@ -9,6 +9,39 @@ type MachineData = {
   machineE: number | null;
 };
 
+// function algo(
+//   weights: number[],
+//   values: number[],
+//   counts: number[],
+//   capacity: number
+// ) {
+//   const n = weights.length;
+
+//   const dp = Array(capacity + 1).fill(0);
+
+//   for (let i = 0; i < n; i++) {
+//     const weight = weights[i];
+//     const value = values[i];
+//     const count = counts[i];
+
+//     // Create a temporary array to avoid counting the same item multiple times
+//     const tempDp = [...dp];
+
+//     for (let j = weight; j <= capacity; j++) {
+//       for (let k = 1; k <= count; k++) {
+//         // Check if we can use k instances of this item
+//         if (j >= k * weight) {
+//           dp[j] = Math.max(dp[j], tempDp[j - k * weight] + k * value);
+//         } else {
+//           break;
+//         }
+//       }
+//     }
+//   }
+
+//   return dp[capacity];
+// }
+
 export async function POST(request: Request) {
   try {
     const formData: MachineData = await request.json();
@@ -46,20 +79,9 @@ export async function POST(request: Request) {
       machineNames.push(machine);
     });
 
-    if (totalPower > MAX_POWER) {
-      const status = "error";
-      const emoji = "❌";
-      const message = `${emoji} Total Electricity: ${totalPower}kW`;
+    // const maxProtein = algo(weights, values, counts, MAX_POWER);
 
-      return NextResponse.json({
-        status,
-        message,
-        totalPower,
-        totalValue,
-        optimal: false,
-      });
-    }
-
+    // Always calculate the optimal solution
     const optimizedResult = optimizeKnapsack(
       MAX_POWER,
       weights,
@@ -68,16 +90,17 @@ export async function POST(request: Request) {
       machineNames
     );
 
-    const status = "success";
-    const emoji = "✅";
-    const message = `${emoji} Total Protein: ${optimizedResult.maxValue}kg`;
+    const isCurrentConfigValid = totalPower <= MAX_POWER;
+    const status = isCurrentConfigValid ? "success" : "warning";
+    const emoji = isCurrentConfigValid ? "✅" : "⚠️";
+    const message = `${emoji} Current Power: ${totalPower}kW, Current Protein: ${totalValue}kg\nOptimal Solution Available: ${optimizedResult.maxValue}kg`;
 
     return NextResponse.json({
       status,
       message,
-      totalPower: totalPower,
-      totalValue: totalValue,
-      optimal: true,
+      currentPower: totalPower,
+      currentValue: totalValue,
+      isCurrentConfigValid,
       optimizedValue: optimizedResult.maxValue,
       optimizedRuns: optimizedResult.optimalRuns,
     });
@@ -89,7 +112,6 @@ export async function POST(request: Request) {
   }
 }
 
-// Bounded Knapsack implementation
 function optimizeKnapsack(
   capacity: number,
   weights: number[],

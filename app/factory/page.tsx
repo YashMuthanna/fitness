@@ -13,13 +13,13 @@ type MachineData = {
 };
 
 type ComputeResponse = {
-  status: "success" | "error";
+  status: "success" | "warning";
   message: string;
-  totalPower: number;
-  totalValue: number;
-  optimal: boolean;
-  optimizedValue?: number;
-  optimizedRuns?: Record<string, number>;
+  currentPower: number;
+  currentValue: number;
+  isCurrentConfigValid: boolean;
+  optimizedValue: number;
+  optimizedRuns: Record<string, number>;
 };
 
 export default function FactoryPage() {
@@ -131,11 +131,11 @@ export default function FactoryPage() {
             <h2 className="text-xl font-semibold">Results</h2>
           </div>
           <div className="p-6">
-            <div className="text-lg font-medium text-center mb-4">
+            <div className="text-lg font-medium text-center mb-4 whitespace-pre-line">
               {result.message}
             </div>
 
-            {result.optimal && result.optimizedRuns && (
+            {result.optimizedRuns && (
               <div className="mt-6">
                 <div className="text-sm font-semibold mb-2 text-center">
                   Optimal Configuration (Max Protein: {result.optimizedValue}kg)
