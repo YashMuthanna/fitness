@@ -16,6 +16,9 @@ export default function Dashboard() {
   const router = useRouter();
   const [prompt, setPrompt] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [prevResponseId, setPrevResponseId] = useState<string | undefined>(
+    undefined
+  );
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
@@ -41,17 +44,20 @@ export default function Dashboard() {
       const response = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: userPrompt }),
+        body: JSON.stringify({
+          prompt: userPrompt,
+          previous_response_id: prevResponseId,
+        }),
       });
 
       const data = await response.json();
-
+      setPrevResponseId(data.responseId);
       // Add AI response
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          content: data.result,
+          content: data.resultText,
         },
       ]);
     } catch (error) {

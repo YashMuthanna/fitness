@@ -3,33 +3,29 @@ import openai from "@/lib/openai";
 
 interface GenerateRequest {
   prompt: string;
+  previous_response_id?: string;
 }
 
 export async function POST(request: Request) {
-  const body: GenerateRequest = await request.json();
+  const { prompt, previous_response_id }: GenerateRequest =
+    await request.json();
 
-  if (!body.prompt) {
+  if (!prompt) {
     return NextResponse.json({ error: "Prompt is required" }, { status: 400 });
   }
 
   try {
-    const response = await openai.chat.completions.create({
+    const response = await openai.responses.create({
       model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are a certified fitness coach. Answer questions strictly about bodybuilding, nutrition, and exercise.",
-        },
-        {
-          role: "user",
-          content: body.prompt,
-        },
-      ],
-      max_tokens: 250,
+      instructions:
+        "You are a fitness advisor giving advice to users on fitness and nutrition related topics like exercise, diet, nutrition and other general health and fitness tips. If you do not know something, say so. If question asked is not fitness, health, exercise or nutrition related, prompt the user to ask fitness or health related questions only.",
+      input: prompt,
+      previous_response_id: previous_response_id,
+      store: true,
     });
 
-    return NextResponse.json({ result: response.choices[0].message.content });
+    const output = response.output_text;
+    return NextResponse.json({ resultText: output, responseId: response.id });
   } catch (error) {
     console.error(error);
     return NextResponse.json(
