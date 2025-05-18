@@ -20,3 +20,4 @@ A prototype for a Bodybuilding and Fitness App that makes use of Generative AI t
 - Set up some extra context for the LLM, pass in some additional user specific info taken during sign up and give it as a system prompt.
 - Improve the authentication flow. Move into PKCE server-side auth instead.
 - Look into improving response from LLM, use Agentic frameworks to attach tools, and possibly set up multi-agent architecture ( Although for this use-case it might be overkill) - Maybe take set up different Agents for Nutritionist and Fitness tips.
+![Screenshot 2025-05-16 at 12 35 34 PM](https://github.com/user-attachments/assets/c99fb8ae-6f6f-4d1e-83a6-26bf78480a18)
